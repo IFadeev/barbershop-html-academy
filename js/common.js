@@ -1,39 +1,64 @@
 window.addEventListener('load', function() {
-  const loginLink = document.getElementById('login-link-id');
+
   const modalLogin = document.getElementById('modal-login-id');
-  const modalClose = document.getElementById('modal-close-pop-id');
+
   const loginInput = modalLogin.querySelector('[name=login]');
   const passInput = modalLogin.querySelector('[name=password]');
-  const storage = localStorage.getItem('login');
-  const loginForm = document.querySelector('.login-form');
-  
 
-  loginLink.addEventListener('click', function(e) {
-    e.preventDefault();
-    modalLogin.classList.toggle('modal-show');
-    loginInput.focus();
-    if (storage) {
-      loginInput.value = storage;
-    }
+  let isStorageSupport = true;
+  const storage = '';
 
-    loginForm.addEventListener('submit', function(e){
-      if (!loginInput.value || !passInput.value) {
-        e.preventDefault();
-        alert('Нужно ввести и логин и пароль!');
-      }
-      else {
-        localStorage.setItem('login', loginInput.value);
-        e.preventDefault();
-        console.log(localStorage.getItem('login'))
-      };
-    });
+  try {
+    storage = localStorage.getItem("login");
+  } catch(err) {
+    isStorageSupport = false;
+  }
 
-    
-    modalClose.addEventListener('click', function(e) {
+  document.getElementById('login-link-id')
+    .addEventListener('click', function(e) {
       e.preventDefault();
-      modalLogin.classList.remove('modal-show');
+      modalLogin.classList.toggle('modal-show');
+      modalLogin.classList.remove('modal-error');
+      if (storage) {
+        loginInput.value = storage;
+        passInput.focus();
+      } else {
+        loginInput.focus();
+      }
+
+      document.querySelector('.login-form')
+      .addEventListener('submit', function(e) {
+        if (!loginInput.value || !passInput.value) {
+          e.preventDefault();
+          modalLogin.classList.remove('modal-error');
+          modalLogin.offsetWidth = modalLogin.offsetWidth;
+          modalLogin.classList.add('modal-error');
+        }
+
+        else {
+          if (isStorageSupport) {
+            localStorage.setItem('login', loginInput.value);
+          };
+        };
+      });
+
+      document.getElementById('modal-close-pop-id')
+        .addEventListener('click', function(e) {
+          e.preventDefault();
+          modalLogin.classList.remove('modal-show');
+          modalLogin.classList.remove('modal-error');
+      });
+
+      window.addEventListener('keydown', function(e) {
+        if (e.keyCode == 27) {
+          e.preventDefault();
+          modalLogin.classList.remove('modal-show');
+          modalLogin.classList.remove('modal-error');
+        }
+      });
+
     });
-  });
+
 });
 
 
